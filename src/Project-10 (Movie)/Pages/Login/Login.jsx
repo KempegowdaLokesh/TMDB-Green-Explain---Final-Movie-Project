@@ -17,7 +17,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (username === "kempegowda" && password === "123@Lokesh") {
+    if (username === "Kempegowda Lokesh" && password === "Lokesh@143") {
       localStorage.setItem("isLoggedIn", "true");
       setIsLoggedIn(true); // Set the login state to true
       navigate("/"); // Redirect to homepage after login
