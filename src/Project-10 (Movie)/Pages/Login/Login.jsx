@@ -6,24 +6,71 @@ const LoginPage = ({ setIsLoggedIn }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // ====== CURSOR TRAIL EFFECT ======
   useEffect(() => {
-    // If already logged in, redirect to home
+    const handleMouseMove = (e) => {
+      const cursorTrail = document.createElement("div");
+      cursorTrail.className = "cursor-trail";
+      cursorTrail.style.left = `${e.pageX}px`;
+      cursorTrail.style.top = `${e.pageY}px`;
+      document.body.appendChild(cursorTrail);
+      setTimeout(() => cursorTrail.remove(), 500);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    return () => document.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  // ====== SOUND EFFECT ON HOVER ======
+  useEffect(() => {
+    const loginBtn = document.querySelector(".login-btn");
+    const hoverSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2245/2245-preview.mp3"); // Add your sound file
+
+    const handleHover = () => hoverSound.play();
+
+    if (loginBtn) {
+      loginBtn.addEventListener("mouseenter", handleHover);
+    }
+
+    return () => {
+      if (loginBtn) {
+        loginBtn.removeEventListener("mouseenter", handleHover);
+      }
+    };
+  }, []);
+
+  // ====== AUTO-LOGOUT ON TAB CLOSE/REFRESH ======
+  useEffect(() => {
+    const handleUnload = () => localStorage.removeItem("isLoggedIn");
+    window.addEventListener("beforeunload", handleUnload);
+    return () => window.removeEventListener("beforeunload", handleUnload);
+  }, []);
+
+  // ====== REDIRECT IF ALREADY LOGGED IN ======
+  useEffect(() => {
     if (localStorage.getItem("isLoggedIn") === "true") {
-      navigate("/"); // Redirect to home
+      navigate("/", { replace: true });
     }
   }, [navigate]);
 
+  // ====== LOGIN FORM SUBMISSION ======
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (username === "Kempegowda Lokesh" && password === "Lokesh@143") {
-      localStorage.setItem("isLoggedIn", "true");
-      setIsLoggedIn(true); // Set the login state to true
-      navigate("/"); // Redirect to homepage after login
-    } else {
-      setError("Invalid username or password");
-    }
+    setLoading(true);
+
+    setTimeout(() => {
+      if (username === "Kempegowda Lokesh" && password === "Lokesh@143") {
+        localStorage.setItem("isLoggedIn", "true");
+        setIsLoggedIn(true);
+        navigate("/");
+      } else {
+        setError("Invalid username or password");
+        setLoading(false);
+      }
+    }, 2000); // Simulated delay for animation
   };
 
   return (
@@ -31,34 +78,36 @@ const LoginPage = ({ setIsLoggedIn }) => {
       <div className="login-box">
         <h2>Login</h2>
         {error && <p className="error">{error}</p>}
-        <form onSubmit={handleSubmit} autoComplete="on"> {/* Added autoComplete here */}
+        <form onSubmit={handleSubmit} autoComplete="off">
           <div className="input-group">
             <label htmlFor="username">Username</label>
             <input
               type="text"
-              id="username" // Added the id attribute
-              name="username" // Added the name attribute
+              id="username"
+              name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your username"
               required
-              autoComplete="username" // Added autoComplete for username
+              autoComplete="off"
             />
           </div>
           <div className="input-group">
             <label htmlFor="password">Password</label>
             <input
               type="password"
-              id="password" // Added the id attribute
-              name="password" // Added the name attribute
+              id="password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
-              autoComplete="current-password" // Added autoComplete for password
+              autoComplete="off"
             />
           </div>
-          <button type="submit" className="login-btn">Login</button>
+          <button type="submit" className={`login-btn ${loading ? "loading" : ""}`} disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
       </div>
     </div>
