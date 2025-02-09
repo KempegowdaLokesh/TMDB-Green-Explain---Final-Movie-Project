@@ -326,6 +326,7 @@
 
     .menu.active {
       display: flex;
+      margin-left: 2%;
     }
 
     /* Ensure the menu toggle button is inside the navbar */
