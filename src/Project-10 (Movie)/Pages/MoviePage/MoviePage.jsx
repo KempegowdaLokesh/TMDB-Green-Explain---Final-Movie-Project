@@ -15,8 +15,8 @@ const MoviePage = () => {
     const image_url = "https://image.tmdb.org/t/p/original";
 
     const opts = {
-        height: '390',
-        width: '640',
+        height: window.innerWidth <= 480 ? '200' : '390',  // Smaller height for mobile screens
+        width: window.innerWidth <= 480 ? '100%' : '640',  // Full width on mobile, fixed on larger screens
         playerVars: { autoplay: 1 },
     };
 
@@ -46,19 +46,6 @@ const MoviePage = () => {
             .then((data) => {
                 if (data.results && data.results.length > 0) {
                     setTrailer(data.results[0]?.key);
-                    
-                    if (window.innerWidth <= 425) {
-                        setTimeout(() => {
-                            const videoContainer = document.querySelector(".modal-content");
-                            if (videoContainer.requestFullscreen) {
-                                videoContainer.requestFullscreen();
-                            } else if (videoContainer.webkitRequestFullscreen) {
-                                videoContainer.webkitRequestFullscreen();
-                            } else if (videoContainer.msRequestFullscreen) {
-                                videoContainer.msRequestFullscreen();
-                            }
-                        }, 500);
-                    }
                 } else {
                     alert('No trailer available.');
                 }
@@ -71,10 +58,36 @@ const MoviePage = () => {
 
     const handleCloseTrailer = () => {
         setIsTrailerOpen(false);
-        if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
-            document.exitFullscreen?.();
-            document.webkitExitFullscreen?.();
-            document.msExitFullscreen?.();
+        resetScreenOrientation(); // Reset to normal orientation when closing trailer
+    };
+
+    // Function to detect fullscreen change
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+                if (window.innerWidth <= 480 && screen.orientation) {
+                    screen.orientation.lock("landscape").catch(() => {});
+                }
+            } else {
+                resetScreenOrientation();
+            }
+        };
+
+        document.addEventListener("fullscreenchange", handleFullscreenChange);
+        document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+        document.addEventListener("msfullscreenchange", handleFullscreenChange);
+
+        return () => {
+            document.removeEventListener("fullscreenchange", handleFullscreenChange);
+            document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+            document.removeEventListener("msfullscreenchange", handleFullscreenChange);
+        };
+    }, []);
+
+    // Reset screen orientation when exiting fullscreen
+    const resetScreenOrientation = () => {
+        if (window.innerWidth <= 480 && screen.orientation) {
+            screen.orientation.unlock().catch(() => {});
         }
     };
 
