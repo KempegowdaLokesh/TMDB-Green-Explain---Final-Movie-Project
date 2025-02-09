@@ -9,54 +9,21 @@ const LoginPage = ({ setIsLoggedIn }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // ====== CURSOR TRAIL EFFECT ======
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      const cursorTrail = document.createElement("div");
-      cursorTrail.className = "cursor-trail";
-      cursorTrail.style.left = `${e.pageX}px`;
-      cursorTrail.style.top = `${e.pageY}px`;
-      document.body.appendChild(cursorTrail);
-      setTimeout(() => cursorTrail.remove(), 500);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    return () => document.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  // ====== SOUND EFFECT ON HOVER ======
-  useEffect(() => {
-    const loginBtn = document.querySelector(".login-btn");
-    const hoverSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2245/2245-preview.mp3"); // Add your sound file
-
-    const handleHover = () => hoverSound.play();
-
-    if (loginBtn) {
-      loginBtn.addEventListener("mouseenter", handleHover);
-    }
-
-    return () => {
-      if (loginBtn) {
-        loginBtn.removeEventListener("mouseenter", handleHover);
-      }
-    };
-  }, []);
-
-  // ====== AUTO-LOGOUT ON TAB CLOSE/REFRESH ======
-  useEffect(() => {
+    // Auto-logout when the tab is closed or refreshed
     const handleUnload = () => localStorage.removeItem("isLoggedIn");
+
     window.addEventListener("beforeunload", handleUnload);
     return () => window.removeEventListener("beforeunload", handleUnload);
   }, []);
 
-  // ====== REDIRECT IF ALREADY LOGGED IN ======
   useEffect(() => {
+    // Redirect to home page if already logged in
     if (localStorage.getItem("isLoggedIn") === "true") {
       navigate("/", { replace: true });
     }
   }, [navigate]);
 
-  // ====== LOGIN FORM SUBMISSION ======
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
@@ -108,6 +75,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
           <button type="submit" className={`login-btn ${loading ? "loading" : ""}`} disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
+          {/* <button type="submit" className="login-btn">Login</button> */}
         </form>
       </div>
     </div>

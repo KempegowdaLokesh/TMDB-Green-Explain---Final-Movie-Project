@@ -39,6 +39,22 @@ const MoviePage = () => {
         });
     }, [id]);
 
+    // Function to lock screen orientation to landscape
+    const lockLandscape = () => {
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch((error) => {
+                console.error('Failed to lock orientation:', error);
+            });
+        }
+    };
+
+    // Function to unlock screen orientation
+    const unlockOrientation = () => {
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        }
+    };
+
     const fetchTrailer = (movieId) => {
         setIsTrailerOpen(true);
         fetch(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=7ddeab7e9f7c99d207e10ac678bc4553`)
@@ -46,18 +62,10 @@ const MoviePage = () => {
             .then((data) => {
                 if (data.results && data.results.length > 0) {
                     setTrailer(data.results[0]?.key);
-                    
-                    if (window.innerWidth <= 425) {
-                        setTimeout(() => {
-                            const videoContainer = document.querySelector(".modal-content");
-                            if (videoContainer.requestFullscreen) {
-                                videoContainer.requestFullscreen();
-                            } else if (videoContainer.webkitRequestFullscreen) {
-                                videoContainer.webkitRequestFullscreen();
-                            } else if (videoContainer.msRequestFullscreen) {
-                                videoContainer.msRequestFullscreen();
-                            }
-                        }, 500);
+
+                    // Lock to landscape mode on mobile devices
+                    if (window.innerWidth <= 480) {
+                        lockLandscape();
                     }
                 } else {
                     alert('No trailer available.');
@@ -71,10 +79,11 @@ const MoviePage = () => {
 
     const handleCloseTrailer = () => {
         setIsTrailerOpen(false);
-        if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
-            document.exitFullscreen?.();
-            document.webkitExitFullscreen?.();
-            document.msExitFullscreen?.();
+        setTrailer(null);
+
+        // Unlock orientation when closing the modal
+        if (window.innerWidth <= 480) {
+            unlockOrientation();
         }
     };
 
