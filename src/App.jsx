@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import Navbar from "./Project-10 (Movie)/Components/Navbar/Navbar";
-import Footer from "./Project-10 (Movie)/Components/Footer/Footer";
-import CastDetails from "./Project-10 (Movie)/Pages/Cast/CastDetails";
-import MoviePage from "./Project-10 (Movie)/Pages/MoviePage/MoviePage";
-import Home from "./Project-10 (Movie)/Pages/Home/Home";
-import LoginPage from "./Project-10 (Movie)/Pages/Login/Login"; // Import LoginPage
-import About from "./Project-10 (Movie)/Pages/About/About"; // Import About Page
-import Contact from "./Project-10 (Movie)/Pages/Contact/Contact"; // Import Contact Page
+import Navbar from "./Movie/Components/Navbar/Navbar";
+import Footer from "./Movie/Components/Footer/Footer";
+import CastDetails from "./Movie/Pages/Cast/CastDetails";
+import MoviePage from "./Movie/Pages/MoviePage/MoviePage";
+import Home from "./Movie/Pages/Home/Home";
+import LoginPage from "./Movie/Pages/Login/Login"; // Import LoginPage
+import About from "./Movie/Pages/About/About"; // Import About Page
+import Contact from "./Movie/Pages/Contact/Contact"; // Import Contact Page
 import { DarkModeProvider } from "../src/context/DarkModeContext";
 
 // Protected Route Component

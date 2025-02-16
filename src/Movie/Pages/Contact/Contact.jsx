@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Contact.css';
-import Loader from '../../../Project-10 (Movie)/Components/Loader/Loader';
+import Loader from '../../../Movie/Components/Loader/Loader';
 
 const Contact = () => {
   const [name, setName] = useState('');
