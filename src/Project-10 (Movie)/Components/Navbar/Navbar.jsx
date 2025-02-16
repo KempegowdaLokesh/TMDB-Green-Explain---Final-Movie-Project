@@ -1,17 +1,26 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
-import { useDarkMode } from '../../../context/DarkModeContext';
+import { useDarkMode } from '../../../context/DarkModeContext'; // Import Dark Mode context
 import Loader from '../../Components/Loader/Loader'; // Import the Loader component
 
-const Navbar = ({ resetPagination }) => {  // Accept resetPagination as a prop
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
+const Navbar = ({ resetPagination }) => {
+  const { isDarkMode, toggleDarkMode } = useDarkMode(); // Using Dark Mode context
   const [isMenuActive, setIsMenuActive] = useState(false);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation(); // Get the current location
+
+  // Clear search field when navigating to MoviePage, CastPage, About, or Contact
+  useEffect(() => {
+    const routesToClearSearch = ['/movie', '/cast', '/about', '/contact']; // Add routes where search should be cleared
+    if (routesToClearSearch.some((route) => location.pathname.startsWith(route))) {
+      setSearch(''); // Clear the search field
+    }
+  }, [location.pathname]); // Trigger effect when the path changes
 
   const toggleMenu = () => {
     setIsMenuActive((prev) => !prev);
@@ -28,16 +37,15 @@ const Navbar = ({ resetPagination }) => {  // Accept resetPagination as a prop
   const handleSearchSubmit = (e) => {
     if (e.key === 'Enter' && search.trim()) {
       navigate(`/?search=${encodeURIComponent(search)}`);
-      closeMenu(); // Close menu on search submit
+      closeMenu();
     }
   };
 
   const handleLinkClick = (path) => {
-    if (path === "/") {
-      setSearch(""); // Clear search input when navigating home
-      resetPagination();  // Reset pagination when going to homepage
-      navigate("/", { replace: true }); // Always navigate home
-      closeMenu(); // Close menu on selection
+    if (path === '/') {
+      resetPagination(); // Reset pagination if navigating to the home page
+      navigate('/', { replace: true });
+      closeMenu();
       return;
     }
 
@@ -45,53 +53,68 @@ const Navbar = ({ resetPagination }) => {  // Accept resetPagination as a prop
     setTimeout(() => {
       navigate(path);
       setLoading(false);
-      closeMenu(); // Close menu after navigation
+      closeMenu();
     }, 1000);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn"); // Remove login status
-    navigate("/login"); // Redirect to login page
+    localStorage.removeItem('isLoggedIn'); // Clear login status
+    navigate('/login'); // Redirect to login page
   };
 
   return (
-    <nav className={`navbar ${isDarkMode ? 'dark' : ''}`}>
-      {/* Ensure that logo link navigates to Home and resets pagination */}
+    <nav className={`navbar ${isDarkMode ? 'dark' : 'light'}`}>
+      {/* Logo */}
       <Link
         className="logo animated-logo"
         to="/"
         onClick={(e) => {
-          e.preventDefault(); // Prevent default anchor behavior
-          handleLinkClick('/'); // Trigger the home link with reset pagination
+          e.preventDefault();
+          handleLinkClick('/');
         }}
       >
         🎞️ ScreenTrail
       </Link>
 
-      {/* Show Loader when loading */}
+      {/* Loader */}
       {loading && <Loader />}
 
+      {/* Menu */}
       <div className={`menu ${isMenuActive ? 'active' : ''}`}>
-        <label htmlFor="search"></label>
         <input
           type="text"
           id="search"
-          name="search"
           placeholder="Search for a movie"
           value={search}
           onChange={handleSearchChange}
-          onKeyDown={handleSearchSubmit} // Close menu when pressing Enter
+          onKeyDown={handleSearchSubmit}
           className="search-input"
         />
         <ul>
-          <li><Link to="/" onClick={() => handleLinkClick('/')}>Home</Link></li>
-          <li><Link to="/about" onClick={() => handleLinkClick('/about')}>About</Link></li>
-          <li><Link to="/contact" onClick={() => handleLinkClick('/contact')}>Contact</Link></li>
+          <li>
+            <Link to="/" onClick={() => handleLinkClick('/')}>
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link to="/about" onClick={() => handleLinkClick('/about')}>
+              About
+            </Link>
+          </li>
+          <li>
+            <Link to="/contact" onClick={() => handleLinkClick('/contact')}>
+              Contact
+            </Link>
+          </li>
         </ul>
       </div>
 
-      <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      {/* Logout Button */}
+      <button className="logout-btn" onClick={handleLogout}>
+        Logout
+      </button>
 
+      {/* User Profile Dropdown */}
       <div className="user-profile" onClick={() => setShowDropdown(!showDropdown)}>
         <span className="user-icon">👤</span>
         {showDropdown && (
@@ -101,6 +124,7 @@ const Navbar = ({ resetPagination }) => {  // Accept resetPagination as a prop
         )}
       </div>
 
+      {/* Dark/Light Mode Toggle Button */}
       <button onClick={toggleDarkMode} className="icon-dark-mode-toggle">
         {isDarkMode ? '🌞' : '🌙'}
       </button>
@@ -109,6 +133,7 @@ const Navbar = ({ resetPagination }) => {  // Accept resetPagination as a prop
         {isDarkMode ? 'Light Mode' : 'Dark Mode'}
       </button>
 
+      {/* Menu Toggle (Hamburger Icon) */}
       <div className="menu-toggle" onClick={toggleMenu}>
         <span className="bar"></span>
         <span className="bar"></span>

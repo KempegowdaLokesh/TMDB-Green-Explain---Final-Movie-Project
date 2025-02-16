@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./Project-10 (Movie)/Components/Navbar/Navbar";
 import Footer from "./Project-10 (Movie)/Components/Footer/Footer";
 import CastDetails from "./Project-10 (Movie)/Pages/Cast/CastDetails";
@@ -27,6 +27,7 @@ const App = () => {
   return (
     <DarkModeProvider>
       <BrowserRouter>
+        {/* Wrapping the entire app in BrowserRouter to provide Router context */}
         <Routes>
           {/* Login Route */}
           <Route path="/login" element={<LoginPage setIsLoggedIn={setIsLoggedIn} />} />
@@ -43,11 +44,12 @@ const App = () => {
                       <Route path="/" element={<ProtectedRoute element={<Home />} />} />
                       <Route path="/movie/:id" element={<ProtectedRoute element={<MoviePage />} />} />
                       <Route path="/cast/:castId" element={<ProtectedRoute element={<CastDetails />} />} />
-                      <Route path="/about" element={<ProtectedRoute element={<About />} />}/>
-                      <Route path="/contact" element={<ProtectedRoute element={<Contact />} />}/>
+                      <Route path="/about" element={<ProtectedRoute element={<About />} />} />
+                      <Route path="/contact" element={<ProtectedRoute element={<Contact />} />} />
                     </Routes>
                   </div>
-                  <Footer />
+                  {/* Using the location hook inside Router to check the current pathname */}
+                  <LocationBasedFooter />
                 </>
               ) : (
                 <Navigate to="/login" replace />
@@ -60,7 +62,14 @@ const App = () => {
   );
 };
 
-export default App;
+// LocationBasedFooter component that uses `useLocation` hook inside the Router context
+const LocationBasedFooter = () => {
+  const location = useLocation(); // Now works because it's inside the Router context
+  
+  return (
+    // Always show Footer on Home, About, and Contact pages
+    (location.pathname === "/" || location.pathname === "/about" || location.pathname === "/contact") && <Footer />
+  );
+};
 
-// Ensure you create a "public/_redirects" file with the following content:
-// /* /index.html 200
+export default App;
